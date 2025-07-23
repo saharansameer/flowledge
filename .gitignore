@@ -1,0 +1,22 @@
+# dependencies
+node_modules/
+dist/
+
+# build
+build/
+dist/
+
+# Ignore environment variables
+.env*
+!.env.sample
+
+# Ignore specific folders and files
+server/node_modules/
+client/node_modules/
+
+# typescript
+*.tsbuildinfo
+
+# Logs
+logs
+*.log
