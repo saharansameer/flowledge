@@ -4,7 +4,7 @@ export class ApiError extends Error {
   public status: number
   public success: boolean;
   public errors: string[];
-  public stack?: string | undefined;
+  public stack: string | undefined;
   public data: null;
 
   constructor({

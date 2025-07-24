@@ -1,8 +1,8 @@
 export interface ErrorConstructorParams {
   status: number;
-  success: boolean;
+  success?: boolean;
   message: string;
-  errors: string[];
+  errors?: string[];
   stack?: string;
 }
 
