@@ -1,0 +1,25 @@
+# dependencise
+node_modules/
+
+# builds
+dist/
+coverage/
+
+# environment files
+.env*
+    
+# packages
+package.json
+package-lock.json
+
+# config files
+*.config.ts
+*.config.js
+*.config.mjs
+
+# typescript
+tsconfig.json
+
+#tanstack
+.tanstack/
+*.gen.ts
