@@ -1,7 +1,6 @@
 import {
   pgTable,
   uuid,
-  varchar,
   text,
   timestamp,
   uniqueIndex
@@ -13,12 +12,13 @@ import { UserRole, TicketStatus, TicketPriority } from "@/types";
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
 
-  username: varchar("username", {length: 24}).unique().notNull(),
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
 
   role: text("role").$type<UserRole>().default("USER").notNull(),
   skills: text("skills").array().default(sql`'{}'::text[]`).notNull(),
+
+  refreshToken: text("refresh_token").default(""),
 
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow()

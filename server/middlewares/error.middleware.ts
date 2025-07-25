@@ -1,5 +1,5 @@
 import { ErrorHandler, Middleware } from "@/types";
-import { ApiError } from "@/utils/api-response";
+import { ApiError } from "@/utils/api/api-response";
 
 export const errorHandler: ErrorHandler = (err, _req, res, _next) => {
   // Check if the error is a valid instance of the Error class
