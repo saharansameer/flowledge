@@ -33,3 +33,9 @@ export const HTTP_STATUS = {
   RATE_LIMIT_EXCEEDED: 429,
   INTERNAL_SERVER_ERROR: 500,
 };
+
+export const userRole = ["ADMIN", "MODERATOR", "USER"];
+
+export const ticketStatus = ["OPEN", "CLOSED"];
+
+export const ticketPriority = ["LOW", "MEDIUM", "HIGH"];

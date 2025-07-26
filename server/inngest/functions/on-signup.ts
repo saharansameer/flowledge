@@ -15,11 +15,11 @@ export const onSignup = inngest.createFunction(
     try {
       const { email } = event.data;
 
-      // First Step
+      // Step One - Find user's email
       const user = await step.run("get-user-email", async () => {
         const userDetails = await db.query.users.findFirst({
-          columns: { id: true, email: true },
           where: eq(users.email, email),
+          columns: { id: true, email: true },
         });
 
         if (!userDetails) {
@@ -29,7 +29,7 @@ export const onSignup = inngest.createFunction(
         return userDetails;
       });
 
-      // Second Step
+      // Step Two - send a welcome email to user
       await step.run("send-welcome-email", async () => {
         const subject = "Welcome to Flowledge";
         const { html, text } = welcomeEmailTemplate;
@@ -38,13 +38,12 @@ export const onSignup = inngest.createFunction(
       });
 
       // Final Step
-      return { success: true };
+      return { success: true, message: `${event.name} success` };
     } catch (error: AnyError) {
-      console.error(
-        `${event.name} error: `,
-        error?.message || "An unknown error occurred"
-      );
-      return { success: false };
+      return {
+        success: false,
+        message: `${event.name} : ${error?.message || "An unknown error occurred"}`,
+      };
     }
   }
 );

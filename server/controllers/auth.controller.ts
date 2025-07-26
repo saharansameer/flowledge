@@ -35,6 +35,19 @@ export const signup: Controller = async (req, res) => {
       });
     }
 
+    // Check if user already exist
+    const userExists = await db.query.users.findFirst({
+      where: and(eq(users.email, email)),
+      columns: { id: true },
+    });
+
+    if (userExists) {
+      throw new ApiError({
+        status: HTTP_STATUS.BAD_REQUEST,
+        message: "An account already exist with this email",
+      });
+    }
+
     // Validate Password
     const passwordResult = passwordValidator.safeParse(password);
     if (!passwordResult.success) {
@@ -62,9 +75,12 @@ export const signup: Controller = async (req, res) => {
     await generateTokens({ id: user.id, role: user.role });
 
     // Final Response
-    return res
-      .status(HTTP_STATUS.CREATED)
-      .json(new ApiResponse({ success: true, message: "User Signup Success" }));
+    return res.status(HTTP_STATUS.CREATED).json(
+      new ApiResponse({
+        success: true,
+        message: "Account Created Successfully",
+      })
+    );
   } catch (error: AnyError) {
     throw new ApiError({
       status: error?.status || HTTP_STATUS.INTERNAL_SERVER_ERROR,
@@ -88,8 +104,8 @@ export const signin: Controller = async (req, res) => {
 
     // Find User
     const user = await db.query.users.findFirst({
-      columns: { id: true, role: true, password: true },
       where: and(eq(users.email, email)),
+      columns: { id: true, role: true, password: true },
     });
 
     if (!user) {
@@ -128,7 +144,13 @@ export const signin: Controller = async (req, res) => {
       .status(HTTP_STATUS.OK)
       .cookie("accessToken", accessToken, cookieOptions)
       .cookie("refreshToken", refreshToken, cookieOptions)
-      .json(new ApiResponse({ success: true, message: "Sign-in Success" }));
+      .json(
+        new ApiResponse({
+          success: true,
+          message: "Signed in",
+          data: user.role,
+        })
+      );
   } catch (error: AnyError) {
     throw new ApiError({
       status: error?.status || HTTP_STATUS.INTERNAL_SERVER_ERROR,
@@ -157,7 +179,7 @@ export const signout: Controller = async (req, res) => {
       .json(
         new ApiResponse({
           success: true,
-          message: "Tokens Deleted from Cookies",
+          message: "Signed out",
         })
       );
   } catch (error: AnyError) {
@@ -191,18 +213,18 @@ export const renewTokens: Controller = async (req, res) => {
 
   // Check User Authentication
   const user = await db.query.users.findFirst({
-    columns: { id: true, role: true, refreshToken: true },
     where: and(
       eq(users.id, tokenPayload.id),
       eq(users.role, tokenPayload.role),
       eq(users.refreshToken, existingRefreshToken)
     ),
+    columns: { id: true, role: true, refreshToken: true },
   });
 
   if (!user) {
     throw new ApiError({
       status: HTTP_STATUS.UNAUTHORIZED,
-      message: "User is not Authenticated",
+      message: "Not Authorized",
     });
   }
 
@@ -221,6 +243,7 @@ export const renewTokens: Controller = async (req, res) => {
       new ApiResponse({
         success: true,
         message: "Tokens Renewed",
+        data: user.role,
       })
     );
 };

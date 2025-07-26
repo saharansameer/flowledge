@@ -1,10 +1,16 @@
 # dependencies
 node_modules/
-dist/
 
 # build
 build/
 dist/
+dist-ssr/
+*.local
+
+# logs
+logs/
+*.log
+npm-debug.log*
 
 # Ignore environment variables
 .env*
@@ -13,6 +19,7 @@ dist/
 # Ignore specific folders and files
 server/node_modules/
 client/node_modules/
+.tanstack/
 
 # typescript
 *.tsbuildinfo
