@@ -14,6 +14,7 @@ import { LoaderSpin, ErrorMessage, PasswordInput } from "@/components";
 import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 import axios from "@/app/config/axios";
+import useAuthStore from "@/app/store/auth-store";
 
 interface AuthFormProps {
   mode: "sign-in" | "sign-up";
@@ -22,6 +23,7 @@ interface AuthFormProps {
 export function AuthForm({ mode }: AuthFormProps) {
   const isSignIn = mode === "sign-in";
   const navigate = useNavigate();
+  const { setTokenExpiry, setAuthenticated, setUserRole } = useAuthStore();
 
   // Signin Logic
   const form = useForm<AuthSchemaInputs>({
@@ -33,29 +35,30 @@ export function AuthForm({ mode }: AuthFormProps) {
   const onSigninHandler: SubmitHandler<AuthSchemaInputs> = async (formData) => {
     const toastId = toast.loading("Please wait...");
 
-    try {
-      const { email, password } = formData;
+    const { email, password } = formData;
 
-      const response = await axios.post(`/api/v1/auth/${mode}`, {
+    const { success, message, data } = await axios
+      .post(`/api/v1/auth/${mode}`, {
         email,
         password,
-      });
+      })
+      .then((res) => res.data)
+      .catch((err) => err.response.data);
 
-      const { success, message } = response.data;
-
-      if (!success) {
-        toast.error(message, { id: toastId });
-        return;
-      }
-
-      toast.success(message, { id: toastId });
-      navigate({ to: isSignIn ? "/dashboard" : "/sign-in" });
-    } catch {
-      toast.error(`Someting went wrong during ${mode}`, {
-        id: toastId,
-      });
-      form.reset();
+    if (!success) {
+      toast.error(message, { id: toastId });
+      form.setError("root", { type: "validate", message });
+      return;
     }
+
+    if (isSignIn) {
+      setTokenExpiry(Date.now() + 15 * 60 * 1000);
+      setAuthenticated(true);
+      setUserRole(data);
+    }
+
+    toast.success(message, { id: toastId });
+    navigate({ to: isSignIn ? "/dashboard" : "/sign-in" });
   };
 
   // Signin Form (UI)

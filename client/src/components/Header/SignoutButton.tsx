@@ -1,27 +1,38 @@
 import axios from "@/app/config/axios";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useRouter } from "@tanstack/react-router";
 import { Button } from "@/components/ui";
 import { toast } from "sonner";
-import { isAuthorized } from "@/lib/auth";
+import useAuthStore from "@/app/store/auth-store";
 
-export function LogoutButton() {
+export function SignoutButton() {
   const navigate = useNavigate();
+  const router = useRouter();
+  const { authenticated } = useAuthStore();
 
   const onSignOutHandler = async () => {
-    try {
-      if (!(await isAuthorized())) {
-        throw navigate({ to: "/" });
-      }
-      const response = await axios.patch("/api/v1/auth/sign-out");
-      const { message } = response.data;
-      toast.info(message);
-      navigate({ to: "/" });
-    } catch {
-      toast.error("Unexpected error while Signing-out");
+    if (!authenticated) {
+      return;
     }
+
+    const { success, message } = await axios
+      .patch("/api/v1/auth/sign-out")
+      .then((res) => res.data)
+      .catch((err) => err.response.data);
+
+    if (!success) {
+      await router.invalidate();
+      toast.error(message);
+      return;
+    }
+
+    toast.info(message);
+    localStorage.removeItem("auth");
+    await router.invalidate();
+    navigate({ to: "/" });
+    window.location.reload();
   };
   return (
-    <Button variant={"outline"} onClick={onSignOutHandler}>
+    <Button variant={null} onClick={onSignOutHandler} className="nav-button">
       Sign out
     </Button>
   );

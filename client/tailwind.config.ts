@@ -4,7 +4,8 @@ const config: Config = {
   darkMode: "class",
   content: {
     files: [
-      "./src/app/**/*.{ts,tsx}",
+      "./src/**/*.{ts,tsx}",
+      "./src/routes/**/*.{ts,tsx}",
       "./src/components/**/*.{ts,tsx}",
       "./src/components/ui/**/*.{ts,tsx}",
     ],

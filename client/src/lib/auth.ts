@@ -3,58 +3,54 @@ import axios from "@/app/config/axios";
 import { redirect } from "@tanstack/react-router";
 
 export async function checkAuth() {
-  const { tokenExpiry, setTokenExpiry, setAuthenticated, setUserRole } =
-    useAuthStore.getState();
-  const now = Date.now();
-  try {
-    if (tokenExpiry < now) {
-      const response = await axios.patch("/api/v1/auth/renew-token");
-      if (!response.data.success) {
-        localStorage.removeItem("auth");
-        await axios.get("/api/v1/auth/clear-cookie");
-        throw redirect({ to: "/sign-in" });
-      }
-
-      setTokenExpiry(now + 15 * 60 * 1000);
-      setAuthenticated(true);
-      setUserRole(response.data.data);
+  if (!isAuthorized()) {
+    const renewed = await renewToken();
+    if (!renewed) {
+      throw redirect({ to: "/sign-in" });
     }
-
-    return;
-  } catch {
-    throw redirect({ to: "/" });
   }
+
+  return;
 }
 
-export async function isAuthorized() {
-  const { tokenExpiry, setTokenExpiry, setAuthenticated, setUserRole } =
-    useAuthStore.getState();
+export function isAuthorized() {
+  const { tokenExpiry } = useAuthStore.getState();
   const now = Date.now();
 
-  try {
-    if (tokenExpiry < now) {
-      const response = await axios.patch("/api/v1/auth/renew-token");
-      if (!response.data.success) {
-        localStorage.removeItem("auth");
-        await axios.get("/api/v1/auth/clear-cookie");
-        return false;
-      }
-
-      setTokenExpiry(now + 15 * 60 * 1000);
-      setAuthenticated(true);
-      setUserRole(response.data.data);
-
-      return true;
-    }
-
-    return true;
-  } catch {
+  if (tokenExpiry < now) {
     return false;
   }
+
+  return true;
 }
 
-export async function redirectToDashboard() {
-  if (await isAuthorized()) {
+export async function renewToken() {
+  const { setTokenExpiry, setAuthenticated, setUserRole, authenticated } =
+    useAuthStore.getState();
+  const now = Date.now();
+
+  if (!authenticated) {
+    return false;
+  }
+
+  const { success, data } = await axios
+    .patch("/api/v1/auth/renew-token")
+    .then((res) => res.data)
+    .catch((err) => err.response.data);
+  if (!success) {
+    localStorage.removeItem("auth");
+    await axios.get("/api/v1/auth/clear-cookie");
+    return false;
+  }
+
+  setTokenExpiry(now + 15 * 60 * 1000);
+  setAuthenticated(true);
+  setUserRole(data);
+  return true;
+}
+
+export function redirectToDashboard() {
+  if (isAuthorized()) {
     throw redirect({ to: "/dashboard" });
   }
   return;
