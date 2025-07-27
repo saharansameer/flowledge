@@ -9,6 +9,7 @@ import { undefinedRoutesHandler } from "@/middlewares/error.middleware";
 import { serve } from "inngest/express";
 import { inngest } from "@/inngest/client";
 import { onSignup } from "@/inngest/functions/on-signup";
+import { onTicketCreate } from "@/inngest/functions/on-ticket-create";
 
 const app = express();
 
@@ -24,16 +25,18 @@ app.use(cookieParser());
 
 // Routes Import
 import authRoutes from "@/routes/auth.routes";
+import ticketRoutes from "@/routes/ticket.routes";
 
 // Routes Declaration
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/ticket", ticketRoutes);
 
 // Inngest Route
 app.use(
-  "/api/inngest",
+  "/api/v1/inngest",
   serve({
     client: inngest,
-    functions: [onSignup],
+    functions: [onSignup, onTicketCreate],
   })
 );
 
