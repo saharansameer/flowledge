@@ -4,6 +4,7 @@ import { errorHandler } from "@/middlewares/error.middleware";
 import { checkAuth } from "@/middlewares/auth.middleware";
 import {
   signup,
+  expertSignup,
   signin,
   signout,
   renewTokens,
@@ -14,6 +15,9 @@ const router = Router();
 
 // POST - signup
 router.route("/sign-up").post(asyncHandler(signup));
+
+// POST - expert signup
+router.route("/sign-up/expert").post(asyncHandler(expertSignup));
 
 // POST - signin
 router.route("/sign-in").post(asyncHandler(signin));

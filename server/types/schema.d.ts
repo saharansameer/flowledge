@@ -1,5 +1,5 @@
-export type UserRole = "ADMIN" | "MODERATOR" | "USER"
+export type UserRole = "USER" | "EXPERT";
 
-export type TicketStatus = "OPEN" | "CLOSED"
+export type TicketStatus = "CREATED" | "ASSIGNED" | "RESOLVED" | "CLOSED";
 
-export type TicketPriority = "LOW" | "MEDIUM" | "HIGH"
+export type TicketPriority = "LOW" | "MEDIUM" | "HIGH";

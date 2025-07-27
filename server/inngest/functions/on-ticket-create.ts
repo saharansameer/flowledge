@@ -55,24 +55,16 @@ export const onTicketCreate = inngest.createFunction(
         return skills;
       });
 
-      // Step Three - Assign moderator
-      await step.run("assign-moderator", async () => {
+      // Step Three - Assign expert
+      const assignee = await step.run("assign-expert", async () => {
         // Find a user with relevant skills and assign the ticket
-        let assignee = await db.query.users.findFirst({
+        const assignee = await db.query.users.findFirst({
           where: and(
-            eq(users.role, "MODERATOR"),
+            eq(users.role, "EXPERT"),
             arrayOverlaps(users.skills, relatedSkills)
           ),
           columns: { id: true, skills: true },
         });
-
-        // Assign ticket to admin if no moderator found
-        if (!assignee) {
-          assignee = await db.query.users.findFirst({
-            where: eq(users.role, "ADMIN"),
-            columns: { id: true, skills: true },
-          });
-        }
 
         // Update assignee in database
         await db
@@ -81,6 +73,16 @@ export const onTicketCreate = inngest.createFunction(
           .where(eq(tickets.id, ticket.id));
 
         return assignee;
+      });
+
+      // Step Four - Handle null assignee
+      await step.run("add-assignee-message", async () => {
+        if (!assignee || assignee === undefined) {
+          await db
+            .update(tickets)
+            .set({ assigneeMessage: "We couldn't find an expert with matching skills for this ticket, so it has been marked as CLOSED. Please double-check your title and description, and feel free to submit a new ticket." })
+            .where(eq(tickets.id, ticket.id));
+        }
       });
 
       // Final Step

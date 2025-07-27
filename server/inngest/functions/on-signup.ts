@@ -6,7 +6,7 @@ import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 import { sendEmail } from "@/utils/email/resend";
-import { welcomeEmailTemplate } from "@/utils/email/templates";
+import { userWelcomeEmailTemplate, expertWelcomeEmailTemplate } from "@/utils/email/templates";
 
 export const onSignup = inngest.createFunction(
   { id: "on-signup", retries: 1 },
@@ -19,7 +19,7 @@ export const onSignup = inngest.createFunction(
       const user = await step.run("get-user-email", async () => {
         const userDetails = await db.query.users.findFirst({
           where: eq(users.email, email),
-          columns: { id: true, email: true },
+          columns: { id: true, email: true, role: true },
         });
 
         if (!userDetails) {
@@ -32,7 +32,7 @@ export const onSignup = inngest.createFunction(
       // Step Two - send a welcome email to user
       await step.run("send-welcome-email", async () => {
         const subject = "Welcome to Flowledge";
-        const { html, text } = welcomeEmailTemplate;
+        const { html, text } = user.role === "USER" ? userWelcomeEmailTemplate : expertWelcomeEmailTemplate;
 
         await sendEmail({ to: user.email, subject, html, text });
       });

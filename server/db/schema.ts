@@ -15,8 +15,9 @@ export const users = pgTable("users", {
   email: text("email").notNull().unique(),
   password: text("password").notNull(),
 
-  role: text("role").$type<UserRole>().default("USER").notNull(),
-  skills: text("skills").array().default(sql`'{}'::text[]`).notNull(),
+  role: text("role").$type<UserRole>().notNull(),
+  designation: text("designation").notNull(),
+  skills: text("skills").array().notNull(),
 
   refreshToken: text("refresh_token").default(""),
 
@@ -33,13 +34,14 @@ export const tickets = pgTable("tickets", {
   title: text("title").notNull(),
   description: text("description").notNull(),
 
-  status: text("status").$type<TicketStatus>().default("OPEN").notNull(),
+  status: text("status").$type<TicketStatus>().default("CREATED").notNull(),
   priority: text("priority").$type<TicketPriority>().default("LOW").notNull(),
-  deadline: timestamp("deadline").notNull(),
   relatedSkills: text("related_skills").array().default(sql`'{}'::text[]`).notNull(),
+  helpfulNotes: text("helpful_notes").default(""),
 
   creator: uuid("creator").references(() => users.id).notNull(),
   assignee: uuid("assignee").references(() => users.id),
+  assigneeMessage: text("assignee_message"), 
 
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull()

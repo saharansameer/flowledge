@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import { REFRESH_TOKEN_SECRET } from "@/env";
 
 import db from "@/db";
-import { users } from "@/db/schema";
+import { NewUser, users } from "@/db/schema";
 import { and, eq } from "drizzle-orm";
 
 import { ApiResponse, ApiError } from "@/utils/api/api-response";
@@ -13,9 +13,11 @@ import { emailValidator, passwordValidator } from "@/utils/validators";
 import { generatePasswordHash, comparePasswordHash } from "@/utils/bcrypt";
 import { generateTokens } from "@/utils/jwt-utils";
 import { cookieOptions } from "@/utils/constants";
+import { formatSkills, safeParseValue } from "@/utils/common";
 
 /*
 signup
+expertSignup
 signin
 signout
 renewToken
@@ -27,11 +29,11 @@ export const signup: Controller = async (req, res) => {
     const { email, password } = req.body;
 
     // Validate Email Address
-    const emailResult = emailValidator.safeParse(email);
+    const emailResult = safeParseValue(emailValidator, email);
     if (!emailResult.success) {
       throw new ApiError({
         status: HTTP_STATUS.BAD_REQUEST,
-        message: emailResult.error.message,
+        message: emailResult.message,
       });
     }
 
@@ -49,19 +51,31 @@ export const signup: Controller = async (req, res) => {
     }
 
     // Validate Password
-    const passwordResult = passwordValidator.safeParse(password);
+    const passwordResult = safeParseValue(passwordValidator, password);
     if (!passwordResult.success) {
       throw new ApiError({
         status: HTTP_STATUS.BAD_REQUEST,
-        message: passwordResult.error.message,
+        message: passwordResult.message,
       });
     }
 
+    const userValues: NewUser = {
+      email,
+      password: generatePasswordHash(password),
+      role: "USER",
+      designation: "",
+      skills: [],
+    };
+
     // Insert New User
-    const [user] = await db
-      .insert(users)
-      .values({ email: email, password: generatePasswordHash(password) })
-      .returning();
+    const [user] = await db.insert(users).values(userValues).returning();
+
+    if (!user) {
+      throw new ApiError({
+        status: HTTP_STATUS.BAD_REQUEST,
+        message: "Failed to create new account",
+      });
+    }
 
     // Fire Inngest Event
     await inngest.send({
@@ -70,9 +84,6 @@ export const signup: Controller = async (req, res) => {
         email,
       },
     });
-
-    // Generate Tokens
-    await generateTokens({ id: user.id, role: user.role });
 
     // Final Response
     return res.status(HTTP_STATUS.CREATED).json(
@@ -89,16 +100,103 @@ export const signup: Controller = async (req, res) => {
   }
 };
 
+export const expertSignup: Controller = async (req, res) => {
+  try {
+    const { email, password, designation, skills } = req.body;
+
+    // Validate Email Address
+    const emailResult = safeParseValue(emailValidator, email);
+    if (!emailResult.success) {
+      throw new ApiError({
+        status: HTTP_STATUS.BAD_REQUEST,
+        message: emailResult.message,
+      });
+    }
+
+    // Check if user already exist
+    const userExists = await db.query.users.findFirst({
+      where: and(eq(users.email, email)),
+      columns: { id: true },
+    });
+
+    if (userExists) {
+      throw new ApiError({
+        status: HTTP_STATUS.BAD_REQUEST,
+        message: "An account already exist with this email",
+      });
+    }
+
+    // Validate Password
+    const passwordResult = safeParseValue(passwordValidator, password);
+    if (!passwordResult.success) {
+      throw new ApiError({
+        status: HTTP_STATUS.BAD_REQUEST,
+        message: passwordResult.message,
+      });
+    }
+
+    // Format and Validate Skills Array
+    const skillsArray = formatSkills(skills);
+
+    if (skillsArray.length === 0) {
+      throw new ApiError({
+        status: HTTP_STATUS.BAD_REQUEST,
+        message: "Please add some relevant skills",
+      });
+    }
+
+    // Define user values
+    const userValues: NewUser = {
+      email,
+      password: generatePasswordHash(password),
+      designation,
+      role: "EXPERT",
+      skills: skillsArray,
+    };
+
+    // Insert New User
+    const [user] = await db.insert(users).values(userValues).returning();
+
+    if (!user) {
+      throw new ApiError({
+        status: HTTP_STATUS.BAD_REQUEST,
+        message: "Failed to create new account",
+      });
+    }
+
+    // Fire Inngest Event
+    await inngest.send({
+      name: "user/signup",
+      data: {
+        email,
+      },
+    });
+
+    // Final Response
+    return res.status(HTTP_STATUS.CREATED).json(
+      new ApiResponse({
+        success: true,
+        message: "Account Created Successfully",
+      })
+    );
+  } catch (error: AnyError) {
+    throw new ApiError({
+      status: error?.status || HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      message: error?.message || "An unknown error occurred while expert signup",
+    });
+  }
+};
+
 export const signin: Controller = async (req, res) => {
   try {
     const { email, password } = req.body;
 
     // Validate Email Address
-    const emailResult = emailValidator.safeParse(email);
+    const emailResult = safeParseValue(emailValidator, email);
     if (!emailResult.success) {
       throw new ApiError({
         status: HTTP_STATUS.BAD_REQUEST,
-        message: emailResult.error.message,
+        message: emailResult.message,
       });
     }
 
