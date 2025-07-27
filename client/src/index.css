@@ -1,15 +1,19 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@layer utilities {
-  .layout-container {
-    @apply w-full mx-auto max-w-screen-xl px-2;
-  }
-}
-
 @font-face {
   font-family: "Poppins";
-  src: url("./assets/fonts/poppins/Poppins-Regular.ttf")
+  src: url("./assets/fonts/poppins/Poppins-Regular.ttf");
+}
+
+@layer utilities {
+  .nav-button {
+    @apply px-0 text-foreground sm:text-foreground/70 hover:text-primary transition-colors text-base sm:text-sm;
+  }
+  
+  .destructive-button {
+    @apply bg-destructive text-white shadow-xs hover:bg-destructive/80 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60;
+  }
 }
 
 @custom-variant dark (&:is(.dark *));
