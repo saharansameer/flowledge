@@ -1,13 +1,19 @@
 import useAuthStore from "@/app/store/auth-store";
 import axios from "@/app/config/axios";
 import { redirect } from "@tanstack/react-router";
+import type { UserRole } from "@/types";
 
-export async function checkAuth() {
+export async function checkAuth(roles: UserRole[]) {
   if (!isAuthorized()) {
     const renewed = await renewToken();
     if (!renewed) {
       throw redirect({ to: "/sign-in" });
     }
+  }
+  const { userRole } = useAuthStore.getState();
+
+  if (!roles.includes(userRole)) {
+    throw redirect({ to: "/" });
   }
 
   return;

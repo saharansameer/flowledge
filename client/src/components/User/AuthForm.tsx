@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 import axios from "@/app/config/axios";
 import useAuthStore from "@/app/store/auth-store";
+import { getErrorResponse } from "@/lib/utils";
 
 interface AuthFormProps {
   mode: "sign-in" | "sign-up";
@@ -23,7 +24,8 @@ interface AuthFormProps {
 export function AuthForm({ mode }: AuthFormProps) {
   const isSignIn = mode === "sign-in";
   const navigate = useNavigate();
-  const { setTokenExpiry, setAuthenticated, setUserRole } = useAuthStore();
+  const { setTokenExpiry, setAuthenticated, setUserRole, userRole } =
+    useAuthStore();
 
   // Signin Logic
   const form = useForm<AuthSchemaInputs>({
@@ -43,7 +45,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         password,
       })
       .then((res) => res.data)
-      .catch((err) => err.response.data);
+      .catch((err) => getErrorResponse(err));
 
     if (!success) {
       toast.error(message, { id: toastId });
@@ -58,7 +60,13 @@ export function AuthForm({ mode }: AuthFormProps) {
     }
 
     toast.success(message, { id: toastId });
-    navigate({ to: isSignIn ? "/dashboard" : "/sign-in" });
+    navigate({
+      to: !isSignIn
+        ? "/sign-in"
+        : userRole === "USER"
+          ? "/dashboard"
+          : "/expert-dashboard",
+    });
   };
 
   // Signin Form (UI)

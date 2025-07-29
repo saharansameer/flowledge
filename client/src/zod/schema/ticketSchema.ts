@@ -11,3 +11,11 @@ export const ticketSchema = z.object({
 });
 
 export type TicketSchemaInputs = z.input<typeof ticketSchema>;
+
+export const expertMessageSchema = z.object({
+  expertMessage: z
+    .string({ error: "This can not be empty" })
+    .max(5000, { error: "Message  must not exceed 5000 characters" }),
+});
+
+export type ExpertMessageSchemaInputs = z.input<typeof expertMessageSchema>;

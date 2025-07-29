@@ -21,31 +21,59 @@ function NavItems({
   mobile?: boolean;
   onClick?: () => void;
 }) {
-  const { authenticated } = useAuthStore();
+  const { authenticated, userRole } = useAuthStore();
   return (
-    <div className="justify-end space-x-4" onClick={onClick}>
-      {authenticated ? (
-        <>
-          <Link to={"/dashboard"}>
-            <Button variant={null} className="nav-button">
-              Dashboard
-            </Button>
-          </Link>
-          {mobile && <br />}
-          <SignoutButton />
-        </>
-      ) : (
+    <div className="justify-end space-x-5" onClick={onClick}>
+      {/* Unauthenticated */}
+      {!authenticated && (
         <>
           <Link to={"/home"}>
             <Button variant={null} className="nav-button">
               Home
             </Button>
           </Link>
+          {mobile && <br />}
           <Link to={"/sign-in"}>
             <Button variant={null} className="nav-button">
               Sign in
             </Button>
           </Link>
+        </>
+      )}
+
+      {/* Role: USER */}
+      {authenticated && userRole === "USER" && (
+        <>
+          <Link to={"/create-ticket"}>
+            <Button variant={null} className="nav-button">
+              Create Ticket
+            </Button>
+          </Link>
+          {mobile && <br />}
+          <Link to={"/dashboard"}>
+            <Button variant={null} className="nav-button">
+              Dashboard
+            </Button>
+          </Link>
+        </>
+      )}
+
+      {/* Role: EXPERT */}
+      {authenticated && userRole === "EXPERT" && (
+        <>
+          <Link to={"/expert-dashboard"}>
+            <Button variant={null} className="nav-button">
+              Dashboard
+            </Button>
+          </Link>
+        </>
+      )}
+
+      {/* Common Authenticated */}
+      {authenticated && (
+        <>
+          {mobile && <br />}
+          <SignoutButton />
         </>
       )}
     </div>

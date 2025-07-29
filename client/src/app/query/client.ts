@@ -7,8 +7,9 @@ const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       staleTime: maxAge,
-      gcTime: maxAge,
-      retry: false,
+      refetchOnMount: true,
+      refetchOnReconnect: true,
+      retry: 1,
     },
   },
 });

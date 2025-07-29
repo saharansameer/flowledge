@@ -1,5 +1,9 @@
-export type UserRole = "USER" | "EXPERT";
+import {
+  UserRole,
+  TicketStatus,
+  TicketPriority,
+} from "../../../server/types/schema";
 
-export type TicketStatus = "CREATED" | "ASSIGNED" | "RESOLVED" | "CLOSED";
+import { Ticket } from "../../../server/db/schema";
 
-export type TicketPriority = "LOW" | "MEDIUM" | "HIGH";
+export { UserRole, TicketStatus, TicketPriority, Ticket };

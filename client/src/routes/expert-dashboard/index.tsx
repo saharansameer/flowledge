@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { checkAuth } from "@/lib/auth";
 
-export const Route = createFileRoute("/dashboard/")({
-  beforeLoad: () => checkAuth(["USER"]),
-  component: Dashboard,
+export const Route = createFileRoute("/expert-dashboard/")({
+  beforeLoad: () => checkAuth(["EXPERT"]),
+  component: ExpertDashboard,
 });
 
 import { useQuery } from "@tanstack/react-query";
@@ -11,9 +11,9 @@ import axios from "@/app/config/axios";
 import type { Ticket } from "@/types";
 import { getErrorResponse } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
-import { TicketCard, DashboardSkeleton, EmptyState } from "@/components";
+import { DashboardSkeleton, TicketCard, EmptyState } from "@/components";
 
-async function getCreatedTickets() {
+async function getAssignedTickets() {
   const { data } = await axios
     .get("/api/v1/ticket/all")
     .then((res) => res.data)
@@ -22,10 +22,10 @@ async function getCreatedTickets() {
   return data;
 }
 
-function Dashboard() {
+function ExpertDashboard() {
   const { data, error, isFetching, isPending } = useQuery({
-    queryKey: ["user-dashboard"],
-    queryFn: getCreatedTickets,
+    queryKey: ["expert-dashboard"],
+    queryFn: getAssignedTickets,
   });
 
   if (isFetching || isPending) {
@@ -33,7 +33,7 @@ function Dashboard() {
   }
 
   if (!data) {
-    return <EmptyState role="USER" />;
+    return <EmptyState role="EXPERT" />;
   }
 
   if (error) {
@@ -48,7 +48,7 @@ function Dashboard() {
           key={`${index}-ticket`}
           className="cursor-default"
         >
-          <TicketCard ticket={ticket} />
+          <TicketCard key={`${index}-ticket`} ticket={ticket} />
         </Link>
       ))}
     </div>

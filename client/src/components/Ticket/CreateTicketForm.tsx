@@ -19,6 +19,8 @@ import { toast } from "sonner";
 import { useNavigate } from "@tanstack/react-router";
 import axios from "@/app/config/axios";
 import { CharCount } from "./CharCount";
+import { queryClient } from "@/app/query/client";
+import { getErrorResponse } from "@/lib/utils";
 
 export function CreateTicketForm() {
   const navigate = useNavigate();
@@ -39,7 +41,7 @@ export function CreateTicketForm() {
     const { success, message } = await axios
       .post("/api/v1/ticket/create", { title, description })
       .then((res) => res.data)
-      .catch((err) => err.response.data);
+      .catch((err) => getErrorResponse(err));
 
     if (!success) {
       toast.error(message, { id: toastId });
@@ -47,6 +49,7 @@ export function CreateTicketForm() {
     }
 
     toast.success(message, { id: toastId });
+    await queryClient.invalidateQueries({ queryKey: ["user-dashboard"] });
     navigate({ to: "/dashboard" });
   };
 
@@ -69,7 +72,7 @@ export function CreateTicketForm() {
                 <Input {...field} placeholder="Enter a title for your ticket" />
               </FormControl>
               <FormMessage />
-              <CharCount length={titleValue.length} maxChars={100}/>
+              <CharCount length={titleValue.length} maxChars={100} />
             </FormItem>
           )}
         />
@@ -87,7 +90,7 @@ export function CreateTicketForm() {
                 />
               </FormControl>
               <FormMessage />
-              <CharCount length={descriptionValue.length} maxChars={900}/>
+              <CharCount length={descriptionValue.length} maxChars={900} />
             </FormItem>
           )}
         />

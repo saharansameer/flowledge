@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { checkAuth } from "@/lib/auth";
 
 export const Route = createFileRoute("/create-ticket/")({
-  beforeLoad: () => checkAuth(),
+  beforeLoad: () => checkAuth(["USER"]),
   component: CreateTicketPage,
 });
 
