@@ -18,7 +18,6 @@ export const errorHandler: ErrorHandler = (err, _req, res, _next) => {
   });
 };
 
-
 // Handler for Undefined API Routes
 export const undefinedRoutesHandler: Middleware = (_req, res, _next) => {
   res.status(404).json({

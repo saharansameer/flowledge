@@ -2,17 +2,18 @@ import { ApiResponse, ApiError } from "@/utils/api/api-response";
 import { HTTP_STATUS } from "@/utils/constants";
 import { Controller } from "@/types";
 import { trimAndClean } from "@/utils/common";
+import { checkRole } from "@/utils/common";
 
 import { inngest } from "@/inngest/client";
 
 import db from "@/db";
 import { NewTicket, Ticket, tickets } from "@/db/schema";
-import { and, desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 
 export const createTicket: Controller = async (req, res) => {
   try {
     // Extract title and description from body
-    const { title, description } = req.body();
+    const { title, description } = req.body;
     const trimmedTitle = trimAndClean(title || " ");
 
     if (!trimmedTitle || !description) {
@@ -149,40 +150,34 @@ export const getTicketById: Controller = async (req, res) => {
   }
 };
 
-export const updateTicketStatus: Controller = async (req, res) => {
+export const addExpertMessage: Controller = async (req, res) => {
   try {
-    // Check user role
+    // Check User Role
     const user = req.user!;
-    if (user.role === "USER") {
-      throw new ApiError({
-        status: HTTP_STATUS.FORBIDDEN,
-        message: "Access Denied",
-      });
-    }
+    checkRole(user.role, ["EXPERT"]);
 
-    // Extract tickedId from request params
+    // Extract ticketId and message
     const ticketId = req.params.ticketId;
+    const { message } = req.body;
 
-    if (!ticketId) {
+    if (!ticketId || !message) {
       throw new ApiError({
         status: HTTP_STATUS.BAD_REQUEST,
-        message: "ticketId is not defined",
+        message: "tickedId and message both are required",
       });
     }
 
-    // Update ticket status
-    const [ticket] = await db
+    // Update ticket with expert message and status resolved
+    const [updatedTicket] = await db
       .update(tickets)
-      .set({
-        status: sql`case when ${tickets.status} = 'OPEN' then 'CLOSE else 'OPEN' end`,
-      })
-      .where(eq(tickets.id, ticketId))
+      .set({ assigneeMessage: message, status: "RESOLVED" })
+      .where(eq(tickets.assignee, user.id))
       .returning();
 
-    if (!ticket) {
+    if (!updatedTicket) {
       throw new ApiError({
         status: HTTP_STATUS.BAD_REQUEST,
-        message: "Failed to update ticket status",
+        message: "Failed to add expert message",
       });
     }
 
@@ -190,8 +185,7 @@ export const updateTicketStatus: Controller = async (req, res) => {
     return res.status(HTTP_STATUS.OK).json(
       new ApiResponse({
         success: true,
-        message: "Ticket Status Updated",
-        data: ticket,
+        message: "Message added successfully",
       })
     );
   } catch (error: AnyError) {
@@ -199,7 +193,7 @@ export const updateTicketStatus: Controller = async (req, res) => {
       status: error?.status || HTTP_STATUS.INTERNAL_SERVER_ERROR,
       message:
         error?.message ||
-        "An unknown error occurred while updating ticket status",
+        "An unknown error occurred while adding expert message",
     });
   }
 };

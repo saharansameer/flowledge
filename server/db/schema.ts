@@ -38,6 +38,7 @@ export const tickets = pgTable("tickets", {
   priority: text("priority").$type<TicketPriority>().default("LOW").notNull(),
   relatedSkills: text("related_skills").array().default(sql`'{}'::text[]`).notNull(),
   helpfulNotes: text("helpful_notes").default(""),
+  summary: text("summary").default(""),
 
   creator: uuid("creator").references(() => users.id).notNull(),
   assignee: uuid("assignee").references(() => users.id),

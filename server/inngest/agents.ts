@@ -36,18 +36,18 @@ export async function analyzeTicket({
   Analyze the following support ticket and provide a JSON object with:
 
   - summary: A short 1-2 sentence summary of the issue.
-  - priority: One of "LOW", "MEDIUM", or "HIGH". (IMPORTANT: priority should be in all capital letters)
+  - priority: Choose one of these: "LOW" or "MEDIUM" or "HIGH". (IMPORTANT: priority should be in all capital letters)
   - helpfulNotes: A detailed technical explanation that a moderator can use to solve this issue. Include useful external links or resources if possible.
-  - relatedSkills: An array of relevant skills required to solve the issue (e.g., ["React", "PosgreSQL"]).
+  - relatedSkills: An array of relevant skills (upto 5 most relevant skills only) required to solve the issue (e.g., ["React", "PosgreSQL"]).
 
   Respond ONLY in this JSON format and do not include any other text or markdown in the answer:
 
-  {
+  e.g. {
   "summary": "Short summary of the ticket",
-  "priority": "HIGH",
+  "priority": "ticket priority",
   "helpfulNotes": "Here are useful tips...",
   "relatedSkills": ["React", "Node.js"]
-  }
+  } 
 
   ---
 
@@ -56,14 +56,12 @@ export async function analyzeTicket({
   - Title: ${title}
   - Description: ${description}`);
 
-  const raw = JSON.stringify(response.output[0]);
-
   try {
+    const raw = response.output[0].content;
     const match = raw.match(/```json\s*([\s\S]*?)\s*```/i);
     const jsonString = match ? match[1] : raw.trim();
     return JSON.parse(jsonString);
-  } catch (error: AnyError) {
-    console.error("Failed to parse JSON from AI response", error?.message);
+  } catch {
     return null;
   }
 }

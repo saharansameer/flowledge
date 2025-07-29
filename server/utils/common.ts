@@ -1,3 +1,8 @@
+import { UserRole } from "@/types";
+import { emailValidator, passwordValidator } from "./validators";
+import { ApiError } from "./api/api-response";
+import { HTTP_STATUS } from "./constants";
+
 export function getCurrentFullYear() {
   return new Date().getFullYear();
 }
@@ -9,11 +14,9 @@ export function trimAndClean(val: string) {
 export function formatSkills(val: string) {
   return trimAndClean(val)
     .split(",")
-    .map((val) => val.trim())
+    .map((val) => val.trim().toLowerCase())
     .filter((val) => val !== "");
 }
-
-import { emailValidator, passwordValidator } from "./validators";
 
 export function safeParseValue(
   validator: typeof emailValidator | typeof passwordValidator,
@@ -26,4 +29,13 @@ export function safeParseValue(
   }
 
   return { success: true, message: "Validation Success" };
+}
+
+export function checkRole(role: UserRole, allowedRoles: UserRole[]) {
+  if (!allowedRoles.includes(role)) {
+    throw new ApiError({
+      status: HTTP_STATUS.FORBIDDEN,
+      message: "Access Denied",
+    });
+  }
 }

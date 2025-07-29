@@ -6,7 +6,7 @@ import {
   createTicket,
   getTickets,
   getTicketById,
-  updateTicketStatus,
+  addExpertMessage,
 } from "@/controllers/ticket.controller";
 
 const router = Router();
@@ -21,11 +21,11 @@ router.route("/create").post(asyncHandler(createTicket));
 router.route("/all").get(asyncHandler(getTickets));
 
 // GET - get ticket by id
-// PATCH - update ticket status
+// PATCH - add expert message
 router
   .route("/:ticketId")
   .get(asyncHandler(getTicketById))
-  .patch(asyncHandler(updateTicketStatus));
+  .patch(asyncHandler(addExpertMessage));
 
 // Error Handler
 router.use(errorHandler);
