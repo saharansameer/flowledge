@@ -2,7 +2,7 @@ import { inngest } from "@/inngest/client";
 import { NonRetriableError } from "inngest";
 
 import db from "@/db";
-import { users, tickets } from "@/db/schema";
+import { users, tickets, chats } from "@/db/schema";
 import { and, eq, arrayOverlaps } from "drizzle-orm";
 
 import { analyzeTicket } from "@/inngest/agents";
@@ -83,18 +83,33 @@ export const onTicketCreate = inngest.createFunction(
       // Step Four - Assign Expert
       await step.run("assign-expert", async () => {
         if (!assignee || assignee === undefined) {
+          // Mark ticket as closed if no expert found
           await db
             .update(tickets)
             .set({
               status: "CLOSED",
-              assigneeMessage:
-                "We couldn't find an expert with matching skills for this ticket, so it has been marked as CLOSED. Please double-check your title and description, and feel free to submit a new ticket.",
+              updatedAt: new Date(Date.now()),
             })
             .where(eq(tickets.id, ticket.id));
+
+          // Add message for why ticket was closed
+          await db
+            .insert(chats)
+            .values({
+              message:
+                "We couldn't find an expert with matching skills for this ticket, so it has been marked as CLOSED. Please double-check your title and description, and try submitting a new ticket.",
+              senderRole: "AI",
+              ticketId: ticket.id,
+            });
         } else {
+          // Assign expert if found any
           await db
             .update(tickets)
-            .set({ assignee: assignee.id, status: "ASSIGNED" })
+            .set({
+              assignee: assignee.id,
+              status: "ASSIGNED",
+              updatedAt: new Date(Date.now()),
+            })
             .where(eq(tickets.id, ticket.id));
         }
       });

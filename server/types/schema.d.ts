@@ -1,4 +1,4 @@
-export type UserRole = "USER" | "EXPERT";
+export type UserRole = "USER" | "EXPERT" | "AI";
 
 export type TicketStatus = "CREATED" | "ASSIGNED" | "RESOLVED" | "CLOSED";
 

@@ -2,12 +2,12 @@ import { ApiResponse, ApiError } from "@/utils/api/api-response";
 import { HTTP_STATUS } from "@/utils/constants";
 import { Controller } from "@/types";
 import { trimAndClean } from "@/utils/common";
-import { checkRole } from "@/utils/common";
 
 import { inngest } from "@/inngest/client";
 
 import db from "@/db";
-import { NewTicket, Ticket, tickets } from "@/db/schema";
+import { tickets, chats } from "@/db/schema";
+import { NewTicket, Ticket, TicketWithMessages } from "@/db/schema";
 import { and, desc, eq } from "drizzle-orm";
 
 export const createTicket: Controller = async (req, res) => {
@@ -66,17 +66,17 @@ export const getTickets: Controller = async (req, res) => {
     let ticketsData: Ticket[] = [];
 
     // Fetch Tickets based on user role
-    if (user.role !== "USER") {
+    if (user.role === "USER") {
       ticketsData = await db
         .select()
         .from(tickets)
-        .where(eq(tickets.assignee, user.id))
+        .where(eq(tickets.creator, user.id))
         .orderBy(desc(tickets.createdAt));
     } else {
       ticketsData = await db
         .select()
         .from(tickets)
-        .where(eq(tickets.creator, user.id))
+        .where(eq(tickets.assignee, user.id))
         .orderBy(desc(tickets.createdAt));
     }
 
@@ -112,16 +112,18 @@ export const getTicketById: Controller = async (req, res) => {
     }
 
     // Declare ticket variable
-    let ticket: Ticket | undefined;
+    let ticket: TicketWithMessages | undefined;
 
     // Fetch Ticket based on user role
     if (user.role !== "USER") {
       ticket = await db.query.tickets.findFirst({
         where: and(eq(tickets.id, ticketId), eq(tickets.assignee, user.id)),
+        with: { messages: true },
       });
     } else {
       ticket = await db.query.tickets.findFirst({
         where: and(eq(tickets.id, ticketId), eq(tickets.creator, user.id)),
+        with: { messages: true },
       });
     }
 
@@ -150,11 +152,68 @@ export const getTicketById: Controller = async (req, res) => {
   }
 };
 
-export const addExpertMessage: Controller = async (req, res) => {
+export const updateTicketStatus: Controller = async (req, res) => {
   try {
-    // Check User Role
     const user = req.user!;
-    checkRole(user.role, ["EXPERT"]);
+
+    // Extract tickedId from request params
+    const ticketId = req.params.ticketId;
+
+    if (!ticketId) {
+      throw new ApiError({
+        status: HTTP_STATUS.BAD_REQUEST,
+        message: "ticketId is not defined",
+      });
+    }
+
+    let statusUpdated = false;
+    const now = new Date(Date.now());
+
+    // Update ticket status according to role
+    if (user.role === "USER") {
+      await db
+        .update(tickets)
+        .set({ status: "CLOSED", updatedAt: now })
+        .where(and(eq(tickets.id, ticketId), eq(tickets.creator, user.id)))
+        .returning();
+      statusUpdated = true;
+    } else {
+      await db
+        .update(tickets)
+        .set({ status: "RESOLVED", updatedAt: now })
+        .where(and(eq(tickets.id, ticketId), eq(tickets.assignee, user.id)))
+        .returning();
+
+      statusUpdated = true;
+    }
+
+    if (!statusUpdated) {
+      throw new ApiError({
+        status: HTTP_STATUS.BAD_REQUEST,
+        message: "Failed to update ticket status",
+      });
+    }
+
+    // Final Response
+    return res.status(HTTP_STATUS.OK).json(
+      new ApiResponse({
+        success: true,
+        message: "Ticket Status Updated",
+      })
+    );
+  } catch (error: AnyError) {
+    throw new ApiError({
+      status: error?.status || HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      message:
+        error?.message ||
+        "An unknown error occurred while updating ticket status",
+    });
+  }
+};
+
+export const addTicketMessage: Controller = async (req, res) => {
+  try {
+    const user = req.user!;
 
     // Extract ticketId and message
     const ticketId = req.params.ticketId;
@@ -167,17 +226,23 @@ export const addExpertMessage: Controller = async (req, res) => {
       });
     }
 
-    // Update ticket with expert message and status resolved
-    const [updatedTicket] = await db
-      .update(tickets)
-      .set({ assigneeMessage: message, status: "RESOLVED" })
-      .where(eq(tickets.assignee, user.id))
+    const messageValues = {
+      message,
+      ticketId,
+      senderRole: user.role,
+    };
+
+    // Update ticket with message according to role
+
+    const [newMessage] = await db
+      .insert(chats)
+      .values(messageValues)
       .returning();
 
-    if (!updatedTicket) {
+    if (!newMessage) {
       throw new ApiError({
         status: HTTP_STATUS.BAD_REQUEST,
-        message: "Failed to add expert message",
+        message: "Failed to add ticket message",
       });
     }
 
@@ -185,7 +250,7 @@ export const addExpertMessage: Controller = async (req, res) => {
     return res.status(HTTP_STATUS.OK).json(
       new ApiResponse({
         success: true,
-        message: "Message added successfully",
+        message: "Message Added",
       })
     );
   } catch (error: AnyError) {
