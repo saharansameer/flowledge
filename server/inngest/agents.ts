@@ -57,6 +57,7 @@ export async function analyzeTicket({
   - Description: ${description}`);
 
   try {
+    // @ts-expect-error - 'content' does not exist on some message types
     const raw = response.output[0].content;
     const match = raw.match(/```json\s*([\s\S]*?)\s*```/i);
     const jsonString = match ? match[1] : raw.trim();

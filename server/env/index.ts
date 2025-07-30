@@ -16,4 +16,4 @@ export const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET!;
 export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET!;
 
 export const INNGEST_EVENT_KEY = process.env.INNGEST_EVENT_KEY!;
-export const INNGEST_SIGN_KEY = process.env.INNGEST_SIGN_KEY!
+export const INNGEST_SIGNING_KEY = process.env.INNGEST_SIGNING_KEY!

@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { CLIENT_URL } from "@/env";
+import { CLIENT_URL, INNGEST_SIGNING_KEY } from "@/env";
 
 import { SIZE_LIMIT } from "@/utils/constants";
 import { undefinedRoutesHandler } from "@/middlewares/error.middleware";
@@ -37,10 +37,11 @@ app.use(
   serve({
     client: inngest,
     functions: [onSignup, onTicketCreate],
+    signingKey: INNGEST_SIGNING_KEY,
   })
 );
 
 // Handle Undefined Routes
 app.use(undefinedRoutesHandler);
 
-export default app;
+export { app };

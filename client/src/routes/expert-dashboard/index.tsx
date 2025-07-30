@@ -37,7 +37,7 @@ function ExpertDashboard() {
     return <DashboardSkeleton />;
   }
 
-  if (!data) {
+  if (!data || data.length === 0) {
     return <EmptyState role="EXPERT" />;
   }
 

@@ -1,10 +1,33 @@
-import {
-  UserRole,
-  TicketStatus,
-  TicketPriority,
-} from "../../../server/types/schema";
+export type UserRole = "USER" | "EXPERT" | "AI";
 
-import { Ticket, Chat, TicketWithMessages } from "../../../server/db/schema";
+export type TicketStatus = "CREATED" | "ASSIGNED" | "RESOLVED" | "CLOSED";
 
-export { UserRole, TicketStatus, TicketPriority, Ticket, TicketWithMessages, Chat };
+export type TicketPriority = "LOW" | "MEDIUM" | "HIGH";
 
+export type Ticket = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  title: string;
+  description: string;
+  status: TicketStatus;
+  priority: TicketPriority;
+  relatedSkills: string[];
+  helpfulNotes: string | null;
+  summary: string | null;
+  creator: string;
+  assignee: string | null;
+};
+
+export type Chat = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  ticketId: string;
+  message: string;
+  senderRole: UserRole;
+};
+
+export type TicketWithMessages = Ticket & {
+  messages: Chat[];
+};
