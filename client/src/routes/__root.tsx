@@ -1,7 +1,9 @@
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { SonnerToaster, PageTransition, Header, Footer } from "@/components";
+import { NotFoundPage } from "@/components";
 
 export const Route = createRootRoute({
+  notFoundComponent: NotFoundPage,
   component: () => (
     <>
       <header className="w-full mx-auto max-w-screen-xl px-2">

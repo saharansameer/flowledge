@@ -10,9 +10,8 @@ import { useParams } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import axios from "@/app/config/axios";
 import { getErrorResponse } from "@/lib/utils";
-import { TicketDetails } from "@/components/Ticket/TicketDetails";
 import useAuthStore from "@/app/store/auth-store";
-import { TicketDetailsSkeleton } from "@/components";
+import { TicketDetails, TicketDetailsSkeleton, ErrorState } from "@/components";
 
 async function getTicket(id: string) {
   const { data } = await axios
@@ -41,7 +40,7 @@ function TicketPage() {
   }
 
   if (error) {
-    return <div>{error?.message}</div>;
+    return <ErrorState title={error.name} description={error.message} />;
   }
 
   return (

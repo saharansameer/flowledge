@@ -11,7 +11,7 @@ import axios from "@/app/config/axios";
 import type { Ticket } from "@/types";
 import { getErrorResponse } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
-import { TicketCard, DashboardSkeleton, EmptyState } from "@/components";
+import { TicketCard, DashboardSkeleton, EmptyState, ErrorState } from "@/components";
 
 async function getCreatedTickets() {
   const { data } = await axios
@@ -37,7 +37,7 @@ function Dashboard() {
   }
 
   if (error) {
-    return <div>{error?.message}</div>;
+    return <ErrorState title={error.name} description={error.message} />;
   }
 
   return (
