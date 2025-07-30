@@ -3,10 +3,16 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Clock } from "lucide-react";
 
-export function TicketDetailsSkeleton({ isExpert }: { isExpert: boolean }) {
+interface TicketDetailSkeletonProps {
+  isExpert?: boolean;
+}
+
+export function TicketDetailsSkeleton({
+  isExpert = false,
+}: TicketDetailSkeletonProps) {
   return (
     <div className="w-full mx-auto px-2">
-      <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
+      <div className="max-w-4xl mx-auto space-y-6 py-5">
         {/* Header Section */}
         <div className="space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm">
@@ -91,67 +97,51 @@ export function TicketDetailsSkeleton({ isExpert }: { isExpert: boolean }) {
           </>
         )}
 
-        {/* Expert Response Section */}
-        <div className="space-y-3">
-          {isExpert && (
-            /* Expert Message Form Skeleton */
-            <Card>
-              <CardHeader>
-                <Skeleton className="h-6 w-40" /> {/* Form title */}
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Skeleton className="h-32 w-full rounded-md" /> {/* Textarea */}
-                <Skeleton className="h-10 w-24 rounded-md" />{" "}
-                {/* Submit button */}
-              </CardContent>
-            </Card>
-          )}
-
-          {!isExpert && (
-            /* Ticket Status Card */
-            <Card className="border-l-4 border-l-primary">
-              <CardHeader>
-                <div className="flex items-center gap-x-2">
-                  <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                  <Skeleton className="h-6 w-28" />{" "}
-                  {/* "Ticket Status" title */}
+        {/* Communication Section */}
+        <div className="space-y-4">
+          <Skeleton className="h-6 w-36" /> {/* "Communication" heading */}
+          <div className="space-y-4">
+            {/* Generic message card skeleton */}
+            <div className="border-l-4 border-l-black py-2">
+              <div className="px-2">
+                <div className="flex items-center gap-x-1 pb-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <Skeleton className="h-5 w-24" /> {/* Message sender */}
                 </div>
-              </CardHeader>
-              <CardContent>
                 <div className="space-y-2">
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-4/5" />
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {isExpert && (
-            /* Expert Response Card */
-            <Card>
-              <CardHeader>
-                <Skeleton className="h-6 w-36" />{" "}
-                {/* "Expert Response" title */}
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-5/6" />
                 </div>
-              </CardContent>
-            </Card>
-          )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Message Form Section */}
+        <div className="space-y-5">
+          <div className="space-y-5">
+            <div className="space-y-2">
+              <Skeleton className="h-4 w-16" /> {/* "Message" label */}
+              <Skeleton className="h-32 w-full rounded-md" /> {/* Textarea */}
+              <Skeleton className="h-3 w-24" /> {/* Character count */}
+            </div>
+            <Skeleton className="h-10 w-full max-w-sm rounded-md" />{" "}
+            {/* Send button */}
+          </div>
+          <Separator />
         </div>
 
         {/* Footer Info */}
-        <div className="pt-4 border-t">
+        <div className="flex justify-between items-center pb-20">
           <div className="flex items-center gap-2">
             <Skeleton className="h-4 w-20" /> {/* "Last update:" */}
             <Skeleton className="h-4 w-32" /> {/* Date */}
           </div>
+          <Skeleton className="h-8 w-32 rounded-md" /> {/* Action button */}
         </div>
       </div>
     </div>

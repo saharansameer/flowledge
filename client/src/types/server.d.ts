@@ -4,6 +4,7 @@ import {
   TicketPriority,
 } from "../../../server/types/schema";
 
-import { Ticket } from "../../../server/db/schema";
+import { Ticket, Chat, TicketWithMessages } from "../../../server/db/schema";
 
-export { UserRole, TicketStatus, TicketPriority, Ticket };
+export { UserRole, TicketStatus, TicketPriority, Ticket, TicketWithMessages, Chat };
+

@@ -12,6 +12,7 @@ import axios from "@/app/config/axios";
 import { getErrorResponse } from "@/lib/utils";
 import useAuthStore from "@/app/store/auth-store";
 import { TicketDetails, TicketDetailsSkeleton, ErrorState } from "@/components";
+import { queryClient } from "@/app/query/client";
 
 async function getTicket(id: string) {
   const { data } = await axios
@@ -35,16 +36,22 @@ function TicketPage() {
     return <TicketDetailsSkeleton isExpert={userRole === "EXPERT"} />;
   }
 
-  if (!data) {
-    return <div>Empty</div>;
-  }
-
   if (error) {
     return <ErrorState title={error.name} description={error.message} />;
   }
 
+  if (!data) {
+    return (
+      <ErrorState
+        title={"Try to refresh the page"}
+        description={""}
+        onRefresh={async () => await queryClient.invalidateQueries()}
+      />
+    );
+  }
+
   return (
-    <div className="w-full mx-auto px-2">
+    <div className="w-full min-h-screen mx-auto px-2">
       <TicketDetails ticket={data} />
     </div>
   );

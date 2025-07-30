@@ -12,10 +12,10 @@ export const ticketSchema = z.object({
 
 export type TicketSchemaInputs = z.input<typeof ticketSchema>;
 
-export const expertMessageSchema = z.object({
-  expertMessage: z
+export const messageSchema = z.object({
+  ticketMessage: z
     .string({ error: "This can not be empty" })
-    .max(5000, { error: "Message  must not exceed 5000 characters" }),
+    .max(2000, { error: "Message must not exceed 2000 characters" }),
 });
 
-export type ExpertMessageSchemaInputs = z.input<typeof expertMessageSchema>;
+export type MessageSchemaInputs = z.input<typeof messageSchema>;

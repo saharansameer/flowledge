@@ -1,19 +1,56 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+import { Button, Badge, Separator } from "@/components/ui";
 import { Clock } from "lucide-react";
-import type { Ticket } from "@/types";
+import { TicketBadges } from "./TicketBadges";
+import { MessageForm } from "../User/MessageForm";
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+
+import axios from "@/app/config/axios";
 import useAuthStore from "@/app/store/auth-store";
 import { getFormatDate } from "@/lib/utils";
-import { TicketBadges } from "./TicketBadges";
-import { ExpertMessageForm } from "../User/ExpertMessage";
+import { getErrorResponse } from "@/lib/utils";
+import type { Chat, TicketWithMessages } from "@/types";
+import { toast } from "sonner";
+import { queryClient } from "@/app/query/client";
 
-export function TicketDetails({ ticket }: { ticket: Ticket }) {
+export function TicketDetails({ ticket }: { ticket: TicketWithMessages }) {
   const { userRole } = useAuthStore();
   const isExpert = userRole === "EXPERT";
+  const isResolved = ticket.status === "RESOLVED";
+  const isClosed = ticket.status === "CLOSED";
+
+  const ticketStatusHandler = async () => {
+    if (isClosed || isResolved) {
+      return;
+    }
+
+    const { success, message } = await axios
+      .patch(`/api/v1/ticket/status/${ticket.id}`)
+      .then((res) => res.data)
+      .catch((err) => getErrorResponse(err));
+
+    if (!success) {
+      toast.error(message);
+      return;
+    }
+
+    toast.success(message);
+    await queryClient.invalidateQueries();
+  };
 
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 py-5">
       {/* Header Section */}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm text-muted-foreground select-none">
@@ -51,7 +88,7 @@ export function TicketDetails({ ticket }: { ticket: Ticket }) {
           Related Skills
         </h2>
         <div className="flex flex-wrap gap-2">
-          {ticket.relatedSkills.map((skill, index) => (
+          {ticket.relatedSkills.map((skill: string, index: number) => (
             <Badge key={`${index}-skill`} variant="default">
               {skill}
             </Badge>
@@ -91,51 +128,114 @@ export function TicketDetails({ ticket }: { ticket: Ticket }) {
         </>
       )}
 
-      {/* Expert Response*/}
-      <div className="space-y-3">
-        {isExpert && !ticket.assigneeMessage && (
-          <ExpertMessageForm ticketId={ticket.id} />
-        )}
+      {/* Communication Section */}
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold text-foreground">Communication</h2>
+        <div className="space-y-4">
+          {ticket.messages.length !== 0 &&
+            ticket.messages.map((message: Chat) => (
+              <Card
+                key={message.id}
+                className={`border-l-4 py-2 ${message.senderRole === userRole ? "border-l-orange-400" : "border-l-blue-500"}`}
+              >
+                <CardContent className="px-2">
+                  <CardTitle className="flex text-foreground justify-between pb-2">
+                    <p>
+                      {message.senderRole === userRole
+                        ? "YOU"
+                        : message.senderRole}
+                    </p>
+                    <p className="text-xs font-light">
+                      {getFormatDate(message.createdAt, "date-time")}
+                    </p>
+                  </CardTitle>
+                  <p className="text-foreground/90 leading-relaxed whitespace-pre-wrap">
+                    {message.message}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
 
-        {!isExpert && !ticket.assigneeMessage && (
-          <Card className="border-l-4 border-l-primary">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-x-2 text-lg text-foreground">
-                <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                Ticket Status
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-foreground/90 leading-relaxed whitespace-pre-wrap">
-                {ticket.status === "CREATED"
-                  ? "Your ticket has been created and is currently being reviewed. The most suitable expert will be assigned shortly."
-                  : "An expert is reviewing your ticket. Hang tight — creating multiple tickets on same issue won't speed up the process and might cause delays. We appreciate your patience and are on it!"}
-              </p>
-            </CardContent>
-          </Card>
-        )}
+          {ticket.messages.length === 0 && !isClosed && !isResolved && (
+            <Card className="border-l-4 py-2 border-l-black">
+              <CardContent className="px-2">
+                <CardTitle className="flex items-center gap-x-1 text-foreground pb-2">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  AI Assistant
+                </CardTitle>
+                <p className="text-foreground/90 leading-relaxed whitespace-pre-wrap">
+                  {ticket.status === "CREATED"
+                    ? "Your ticket has been created and is currently being reviewed. The most suitable expert will be assigned shortly."
+                    : "An expert is currently reviewing your ticket. Please hang tight — creating multiple tickets for the same issue won't speed up the process and may cause delays. We appreciate your patience and are working on it. Once the expert responds, their message will appear in this section. You can also send your own message using the box below."}
+                </p>
+              </CardContent>
+            </Card>
+          )}
 
-        {ticket.assigneeMessage && (
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg text-foreground">
-                Expert Response
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-foreground/90 leading-relaxed whitespace-pre-wrap">
-                {ticket.assigneeMessage}
-              </p>
-            </CardContent>
-          </Card>
+          {(isClosed || isResolved) && (
+            <Card className="border-l-4 py-2 border-l-black">
+              <CardContent className="px-2">
+                <CardTitle className="flex text-foreground justify-between pb-2">
+                  <p>AI Assistant</p>
+                  <p className="text-xs font-light">
+                    {getFormatDate(new Date(Date.now()), "date-time")}
+                  </p>
+                </CardTitle>
+                <p className="text-foreground/90 leading-relaxed whitespace-pre-wrap">
+                  {isClosed
+                    ? "Ticket has been CLOSED by User."
+                    : "Ticket has been RESOLVED by the Expert."}
+                </p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* New Message */}
+      <div className="space-y-5">
+        {!isResolved && !isClosed && (
+          <>
+            <MessageForm ticketId={ticket.id} />
+            <Separator />
+          </>
         )}
       </div>
 
       {/* Footer Info */}
-      <div className="pt-4 border-t">
+      <div className="flex justify-between items-center pb-20">
         <p className="text-sm text-muted-foreground">
           Last update: {getFormatDate(ticket.updatedAt, "date-time")}
         </p>
+
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button
+              size={"sm"}
+              variant={"default"}
+              disabled={isResolved || isClosed}
+              className="cursor-pointer"
+            >
+              {isExpert ? "Mark as Resolved" : "Close Ticket"}
+            </Button>
+          </AlertDialogTrigger>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+              <AlertDialogDescription className="text-foreground/90">
+                {`This will mark this ticket as ${isExpert ? "RESOLVED" : "CLOSED"}. This action cannot be undone.`}
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={ticketStatusHandler}>
+                Continue
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );

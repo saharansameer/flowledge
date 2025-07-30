@@ -21,7 +21,6 @@ export const getFormatDate = (date: Date, type: "date-only" | "date-time") => {
           hour: "2-digit",
           minute: "2-digit",
           hourCycle: "h23",
-          timeZone: "UTC",
         }
   ).format(new Date(date));
 };

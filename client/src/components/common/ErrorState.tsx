@@ -28,7 +28,11 @@ export function ErrorState({
           Refresh
         </Button>
 
-        <Button onClick={() => navigate({ to: "/" })} variant="outline" size="sm">
+        <Button
+          onClick={() => navigate({ to: "/" })}
+          variant="outline"
+          size="sm"
+        >
           <Home className="mr-2 h-3 w-3" />
           Go Home
         </Button>

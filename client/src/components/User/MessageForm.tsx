@@ -1,8 +1,8 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
-  expertMessageSchema,
-  type ExpertMessageSchemaInputs,
+  messageSchema,
+  type MessageSchemaInputs,
 } from "@/zod/schema/ticketSchema";
 import { Button } from "@/components/ui";
 import { Textarea } from "../ui/textarea";
@@ -21,20 +21,20 @@ import { toast } from "sonner";
 import { queryClient } from "@/app/query/client";
 import { CharCount } from "@/components/Ticket/CharCount";
 
-export function ExpertMessageForm({ ticketId }: { ticketId: string }) {
-  const form = useForm<ExpertMessageSchemaInputs>({
-    resolver: zodResolver(expertMessageSchema),
-    defaultValues: { expertMessage: "" },
+export function MessageForm({ ticketId }: { ticketId: string }) {
+  const form = useForm<MessageSchemaInputs>({
+    resolver: zodResolver(messageSchema),
+    defaultValues: { ticketMessage: "" },
     mode: "onSubmit",
   });
 
-  const onSubmitHandler: SubmitHandler<ExpertMessageSchemaInputs> = async (
+  const onSubmitHandler: SubmitHandler<MessageSchemaInputs> = async (
     formData
   ) => {
-    const { expertMessage } = formData;
+    const { ticketMessage } = formData;
 
     const { success, message } = await axios
-      .patch(`/api/v1/ticket/${ticketId}`, { message: expertMessage })
+      .post(`/api/v1/ticket/${ticketId}`, { message: ticketMessage })
       .then((res) => res.data)
       .catch((err) => getErrorResponse(err));
 
@@ -44,30 +44,29 @@ export function ExpertMessageForm({ ticketId }: { ticketId: string }) {
     }
 
     toast.success("Message Sent");
-    await queryClient.invalidateQueries({ queryKey: ["ticket", ticketId, "EXPERT"] });
+    await queryClient.invalidateQueries();
     form.reset();
-    window.location.reload();
   };
 
-  const messageValue = form.watch("expertMessage") || "";
+  const messageValue = form.watch("ticketMessage") || "";
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmitHandler)} className="space-y-5">
         <FormField
-          name="expertMessage"
+          name="ticketMessage"
           control={form.control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Expert Message</FormLabel>
+              <FormLabel>Message</FormLabel>
               <FormControl>
                 <Textarea
                   {...field}
-                  placeholder="Write your solution here..."
+                  placeholder="Write your response here..."
                 />
               </FormControl>
               <FormMessage />
-              <CharCount length={messageValue.length} maxChars={5000} />
+              <CharCount length={messageValue.length} maxChars={2000} />
             </FormItem>
           )}
         />
