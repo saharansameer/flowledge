@@ -56,14 +56,17 @@ export function TicketDetails({ ticket }: { ticket: TicketWithMessages }) {
     <div className="max-w-4xl mx-auto space-y-6 py-5">
       {/* Header Section */}
       <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm text-muted-foreground select-none">
-          <TicketBadges status={ticket.status} priority={ticket.priority} />
-          <div className="flex items-center gap-1">
-            <Clock className="h-3 w-3" />
-            <span>
-              Created at {getFormatDate(ticket.createdAt, "date-time")}
-            </span>
+        <div className="space-y-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-sm text-muted-foreground select-none">
+            <TicketBadges status={ticket.status} priority={ticket.priority} />
+            <div className="flex items-center gap-1">
+              <Clock className="h-3 w-3" />
+              <span>
+                Created at {getFormatDate(ticket.createdAt, "date-time")}
+              </span>
+            </div>
           </div>
+          <h4 className="text-muted-foreground text-sm">Ticket #{ticket.id}</h4>
         </div>
 
         <h1 className="text-2xl md:text-3xl font-bold text-foreground leading-tight">
@@ -159,21 +162,24 @@ export function TicketDetails({ ticket }: { ticket: TicketWithMessages }) {
               </Card>
             ))}
 
-          {ticket.messages.length === 0 && !isClosed && !isResolved && (
-            <Card className="border-l-4 py-2 border-l-black">
-              <CardContent className="px-2">
-                <CardTitle className="flex items-center gap-x-1 text-foreground pb-2">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  AI Assistant
-                </CardTitle>
-                <p className="text-foreground/90 leading-relaxed whitespace-pre-wrap">
-                  {ticket.status === "CREATED"
-                    ? "Your ticket has been created and is currently being reviewed. The most suitable expert will be assigned shortly."
-                    : "An expert is currently reviewing your ticket. Please hang tight — creating multiple tickets for the same issue won't speed up the process and may cause delays. We appreciate your patience and are working on it. Once the expert responds, their message will appear in this section. You can also send your own message using the box below."}
-                </p>
-              </CardContent>
-            </Card>
-          )}
+          {ticket.messages.length === 0 &&
+            !isClosed &&
+            !isResolved &&
+            userRole === "USER" && (
+              <Card className="border-l-4 py-2 border-l-black">
+                <CardContent className="px-2">
+                  <CardTitle className="flex items-center gap-x-1 text-foreground pb-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                    AI Assistant
+                  </CardTitle>
+                  <p className="text-foreground/90 leading-relaxed whitespace-pre-wrap">
+                    {ticket.status === "CREATED"
+                      ? "Your ticket has been created and is currently being reviewed. The most suitable expert will be assigned shortly."
+                      : "An expert is currently reviewing your ticket. Please hang tight — creating multiple tickets for the same issue won't speed up the process and may cause delays. We appreciate your patience and are working on it. Once the expert responds, their message will appear in this section. You can also send your own message using the box below."}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
 
           {(isClosed || isResolved) && (
             <Card className="border-l-4 py-2 border-l-black">
@@ -208,7 +214,7 @@ export function TicketDetails({ ticket }: { ticket: TicketWithMessages }) {
       </div>
 
       {/* Footer Info */}
-      <div className="flex justify-between items-center pb-20">
+      <div className="flex flex-col items-start sm:flex-row sm:justify-between pb-20">
         <p className="text-sm text-muted-foreground">
           Last update: {getFormatDate(ticket.updatedAt, "date-time")}
         </p>
@@ -242,7 +248,9 @@ export function TicketDetails({ ticket }: { ticket: TicketWithMessages }) {
           </AlertDialog>
         )}
 
-        {isResolved ? "Ticket Resolved" : isClosed ? "Ticket Closed" : ""}
+        {(isResolved || isClosed) && (
+          <p className="text-sm text-muted-foreground">{ticket.status}</p>
+        )}
       </div>
     </div>
   );
