@@ -9,6 +9,7 @@ export const Route = createFileRoute("/sample-ticket/")({
 import { TicketDetails } from "@/components";
 
 function SampleTicket() {
+  const now = new Date().toISOString();
   const sampleTicketData = {
     id: "ticket_12345",
     title: "Sample Ticket - Unable to Connect to PostgreSQL Database",
@@ -24,10 +25,17 @@ Useful link: https://www.postgresql.org/docs/current/runtime-config-connection.h
     relatedSkills: ["PostgreSQL", "Networking", "Backend Debugging", "Linux"],
     status: "ASSIGNED",
     priority: "LOW",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-    assigneeMessage:
-      "You will be able type your response to the user in this section. Provide guidance, troubleshooting steps, or request more information as needed, then click send.",
+    createdAt: now,
+    updatedAt: now,
+    messages: [
+      {
+        senderRole: "AI",
+        message:
+          "Your interaction with user will be shown in this section and an input box to write your response below this section. Provide guidance, troubleshooting steps, or request more information as needed, then click send.",
+        createdAt: now,
+        updatedAt: now,
+      },
+    ],
   };
 
   return (

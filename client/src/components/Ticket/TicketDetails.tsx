@@ -23,12 +23,15 @@ import { getErrorResponse } from "@/lib/utils";
 import type { Chat, TicketWithMessages } from "@/types";
 import { toast } from "sonner";
 import { queryClient } from "@/app/query/client";
+import { useRouter } from "@tanstack/react-router";
 
 export function TicketDetails({ ticket }: { ticket: TicketWithMessages }) {
   const { userRole } = useAuthStore();
   const isExpert = userRole === "EXPERT";
   const isResolved = ticket.status === "RESOLVED";
   const isClosed = ticket.status === "CLOSED";
+  const router = useRouter();
+  const isSampleTicket = router.state.location.pathname === "/sample-ticket";
 
   const ticketStatusHandler = async () => {
     if (isClosed || isResolved) {
@@ -196,7 +199,7 @@ export function TicketDetails({ ticket }: { ticket: TicketWithMessages }) {
 
       {/* New Message */}
       <div className="space-y-5">
-        {!isResolved && !isClosed && (
+        {!isResolved && !isClosed && !isSampleTicket && (
           <>
             <MessageForm ticketId={ticket.id} />
             <Separator />
@@ -210,32 +213,36 @@ export function TicketDetails({ ticket }: { ticket: TicketWithMessages }) {
           Last update: {getFormatDate(ticket.updatedAt, "date-time")}
         </p>
 
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button
-              size={"sm"}
-              variant={"default"}
-              disabled={isResolved || isClosed}
-              className="cursor-pointer"
-            >
-              {isExpert ? "Mark as Resolved" : "Close Ticket"}
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription className="text-foreground/90">
-                {`This will mark this ticket as ${isExpert ? "RESOLVED" : "CLOSED"}. This action cannot be undone.`}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={ticketStatusHandler}>
-                Continue
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+        {!isResolved && !isClosed && !isSampleTicket && (
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                size={"sm"}
+                variant={"default"}
+                disabled={isResolved || isClosed}
+                className="cursor-pointer"
+              >
+                {isExpert ? "Mark as Resolved" : "Close Ticket"}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription className="text-foreground/90">
+                  {`This will mark this ticket as ${isExpert ? "RESOLVED" : "CLOSED"}. This action cannot be undone.`}
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={ticketStatusHandler}>
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+
+        {isResolved ? "Ticket Resolved" : isClosed ? "Ticket Closed" : ""}
       </div>
     </div>
   );

@@ -20,8 +20,10 @@ export function SignoutButton() {
       .catch((err) => err.response.data);
 
     if (!success) {
+      await axios.get("/api/v1/auth/clear-cookie");
+      localStorage.removeItem("auth");
       await router.invalidate();
-      toast.error(message);
+      window.location.reload()
       return;
     }
 

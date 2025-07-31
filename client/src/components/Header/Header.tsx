@@ -66,6 +66,12 @@ function NavItems({
               Dashboard
             </Button>
           </Link>
+          {mobile && <br />}
+          <Link to={"/account"}>
+            <Button variant={null} className="nav-button">
+              Account
+            </Button>
+          </Link>
         </>
       )}
 
