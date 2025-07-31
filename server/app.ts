@@ -26,10 +26,12 @@ app.use(cookieParser());
 // Routes Import
 import authRoutes from "@/routes/auth.routes";
 import ticketRoutes from "@/routes/ticket.routes";
+import accountRoutes from "@/routes/account.routes";
 
 // Routes Declaration
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/ticket", ticketRoutes);
+app.use("/api/v1/account", accountRoutes);
 
 // Inngest Route
 app.use(

@@ -7,6 +7,7 @@ import { and, eq, arrayOverlaps } from "drizzle-orm";
 
 import { analyzeTicket } from "@/inngest/agents";
 import { ticketPriority } from "@/utils/constants";
+import { getDateNow } from "@/utils/common";
 
 export const onTicketCreate = inngest.createFunction(
   { id: "on-ticket-create", retries: 2 },
@@ -88,19 +89,17 @@ export const onTicketCreate = inngest.createFunction(
             .update(tickets)
             .set({
               status: "CLOSED",
-              updatedAt: new Date(Date.now()),
+              updatedAt: getDateNow(),
             })
             .where(eq(tickets.id, ticket.id));
 
           // Add message for why ticket was closed
-          await db
-            .insert(chats)
-            .values({
-              message:
-                "We couldn't find an expert with matching skills for this ticket, so it has been marked as CLOSED. Please double-check your title and description, and try submitting a new ticket.",
-              senderRole: "AI",
-              ticketId: ticket.id,
-            });
+          await db.insert(chats).values({
+            message:
+              "We couldn't find an expert with matching skills for this ticket, so it has been marked as CLOSED. Please double-check your title and description, and try submitting a new ticket.",
+            senderRole: "AI",
+            ticketId: ticket.id,
+          });
         } else {
           // Assign expert if found any
           await db
@@ -108,7 +107,7 @@ export const onTicketCreate = inngest.createFunction(
             .set({
               assignee: assignee.id,
               status: "ASSIGNED",
-              updatedAt: new Date(Date.now()),
+              updatedAt: getDateNow(),
             })
             .where(eq(tickets.id, ticket.id));
         }

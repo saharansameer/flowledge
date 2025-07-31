@@ -39,3 +39,7 @@ export function checkRole(role: UserRole, allowedRoles: UserRole[]) {
     });
   }
 }
+
+export function getDateNow() {
+  return new Date(Date.now())
+}

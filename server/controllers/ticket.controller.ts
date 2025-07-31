@@ -9,6 +9,7 @@ import db from "@/db";
 import { tickets, chats } from "@/db/schema";
 import { NewTicket, Ticket, TicketWithMessages } from "@/db/schema";
 import { and, desc, eq } from "drizzle-orm";
+import { getDateNow } from "@/utils/common";
 
 export const createTicket: Controller = async (req, res) => {
   try {
@@ -167,20 +168,19 @@ export const updateTicketStatus: Controller = async (req, res) => {
     }
 
     let statusUpdated = false;
-    const now = new Date(Date.now());
 
     // Update ticket status according to role
     if (user.role === "USER") {
       await db
         .update(tickets)
-        .set({ status: "CLOSED", updatedAt: now })
+        .set({ status: "CLOSED", updatedAt: getDateNow() })
         .where(and(eq(tickets.id, ticketId), eq(tickets.creator, user.id)))
         .returning();
       statusUpdated = true;
     } else {
       await db
         .update(tickets)
-        .set({ status: "RESOLVED", updatedAt: now })
+        .set({ status: "RESOLVED", updatedAt: getDateNow() })
         .where(and(eq(tickets.id, ticketId), eq(tickets.assignee, user.id)))
         .returning();
 
