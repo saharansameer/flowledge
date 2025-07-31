@@ -23,6 +23,8 @@ client/node_modules/
 
 # typescript
 *.tsbuildinfo
+routeTree.gen.ts
+*.gen.ts
 
 # Logs
 logs
