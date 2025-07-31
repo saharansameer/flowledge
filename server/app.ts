@@ -8,8 +8,7 @@ import { undefinedRoutesHandler } from "@/middlewares/error.middleware";
 
 import { serve } from "inngest/express";
 import { inngest } from "@/inngest/client";
-import { onSignup } from "@/inngest/functions/on-signup";
-import { onTicketCreate } from "@/inngest/functions/on-ticket-create";
+import { inngestFunctions } from "@/inngest/functions";
 
 const app = express();
 
@@ -38,7 +37,7 @@ app.use(
   "/api/v1/inngest",
   serve({
     client: inngest,
-    functions: [onSignup, onTicketCreate],
+    functions: inngestFunctions,
     signingKey: INNGEST_SIGNING_KEY,
   })
 );

@@ -194,6 +194,9 @@ export const updateTicketStatus: Controller = async (req, res) => {
       });
     }
 
+    // Fire Inngest Event
+    await inngest.send({ name: "ticket/resolve", data: { ticketId } });
+
     // Final Response
     return res.status(HTTP_STATUS.OK).json(
       new ApiResponse({

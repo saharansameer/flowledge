@@ -37,7 +37,7 @@ export const onSignup = inngest.createFunction(
         await sendEmail({ to: user.email, subject, html, text });
       });
 
-      // Final Step
+      // Response
       return { success: true, message: `${event.name} success` };
     } catch (error: AnyError) {
       return {

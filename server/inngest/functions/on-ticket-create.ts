@@ -10,7 +10,7 @@ import { ticketPriority } from "@/utils/constants";
 import { getDateNow } from "@/utils/common";
 
 export const onTicketCreate = inngest.createFunction(
-  { id: "on-ticket-create", retries: 2 },
+  { id: "on-ticket-create", retries: 1 },
   { event: "ticket/create" },
   async ({ event, step }) => {
     try {
