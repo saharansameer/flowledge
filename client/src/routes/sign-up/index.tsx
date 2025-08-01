@@ -11,7 +11,7 @@ import { Link } from "@tanstack/react-router";
 
 function Signup() {
   return (
-    <div className="w-full h-[90vh] flex flex-col justify-center items-center px-4">
+    <div className="w-full min-h-screen sm:h-[90vh] flex flex-col justify-center items-center py-10">
       <Tabs defaultValue="sign-up" className="w-full max-w-md">
         <TabsList className="w-full">
           <TabsTrigger value="sign-up">Sign up</TabsTrigger>

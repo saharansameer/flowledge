@@ -34,7 +34,7 @@ export function HeroSection() {
     {
       icon: UsersIcon,
       title: "Expert Matching",
-      description: "Get connected with the right domain expert for your issue",
+      description: "Get connected with the right domain expert based on your ticket or issue",
     },
     {
       icon: MessageSquare,
@@ -56,19 +56,19 @@ export function HeroSection() {
           >
             {/* Main headline */}
             <motion.div variants={fadeInUp} className="mb-8">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.1] mb-4">
-                <span className="text-foreground block">Get Expert Help</span>
-                <span className="text-primary block">Super Fast</span>
+              <h1 className="text-4xl sm:text-6xl font-bold leading-[1.1] mb-4">
+                <span className="text-foreground block">Get Help or</span>
+                <span className="text-primary block">Become the Help</span>
               </h1>
             </motion.div>
 
             {/* Subheadline */}
             <motion.p
               variants={fadeInUp}
-              className="text-lg sm:text-xl md:text-2xl text-muted-foreground mb-12 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-light"
+              className="text-base sm:text-lg text-muted-foreground mb-12 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-light"
             >
-              Create tickets, get matched with domain experts, and work together
-              until your issue is resolved.
+              Need help? Create a ticket and connect with someone who can solve
+              it. Know your stuff? Join as an expert and start helping others.
             </motion.p>
 
             {/* CTAs */}
@@ -115,9 +115,9 @@ export function HeroSection() {
                   whileHover={{ scale: 1.02, y: -5 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <div className="bg-card border border-border rounded-2xl sm:rounded-3xl p-6 sm:p-8 hover:shadow-lg transition-all duration-300 group">
+                  <div className="bg-card border border-border rounded-2xl sm:rounded-3xl p-4 sm:p-6 hover:shadow-lg transition-all duration-200 group">
                     <div className="flex items-start space-x-4">
-                      <div className="w-12 h-12 sm:w-14 sm:h-14 bg-primary rounded-xl sm:rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 flex-shrink-0">
+                      <div className="w-12 h-12 sm:w-14 sm:h-14 bg-primary rounded-xl sm:rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-200 flex-shrink-0">
                         <feature.icon className="h-6 w-6 sm:h-7 sm:w-7 text-primary-foreground" />
                       </div>
                       <div className="flex-1 min-w-0">

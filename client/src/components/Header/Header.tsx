@@ -27,7 +27,7 @@ function NavItems({
       {/* Unauthenticated */}
       {!authenticated && (
         <>
-          <Link to={"/home"}>
+          <Link to={"/"}>
             <Button variant={null} className="nav-button">
               Home
             </Button>

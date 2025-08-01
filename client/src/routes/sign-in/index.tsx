@@ -10,7 +10,7 @@ import { redirectToDashboard } from "@/lib/auth";
 
 function Signin() {
   return (
-    <div className="w-full h-[90vh] flex flex-col justify-center items-center px-4">
+    <div className="w-full min-h-screen sm:h-[90vh] flex flex-col justify-center items-center py-10">
       <Card className="w-full max-w-md">
         <CardHeader>
           <h1 className="text-3xl font-bold">Sign In</h1>
