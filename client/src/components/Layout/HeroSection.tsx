@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui";
 import {
-  Play as PlayIcon,
   ArrowRight,
   FileText,
   Users as UsersIcon,
@@ -34,7 +33,8 @@ export function HeroSection() {
     {
       icon: UsersIcon,
       title: "Expert Matching",
-      description: "Get connected with the right domain expert based on your ticket or issue",
+      description:
+        "Get connected with the right domain expert based on your ticket or issue",
     },
     {
       icon: MessageSquare,
@@ -72,28 +72,14 @@ export function HeroSection() {
             </motion.p>
 
             {/* CTAs */}
-            <motion.div
-              variants={fadeInUp}
-              className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center lg:justify-start mb-16"
-            >
+            <motion.div variants={fadeInUp} className="mb-16">
               <Link to={"/sign-up"}>
                 <Button
                   size="lg"
-                  className="px-8 sm:px-10 py-4 sm:py-6 text-base sm:text-lg rounded-2xl group"
+                  className="w-full max-w-sm sm:max-w-52 px-8 sm:px-10 py-4 sm:py-6 text-base sm:text-lg rounded-2xl group"
                 >
                   Get Started
                   <ArrowRight className="ml-3 h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </Link>
-
-              <Link to={"/"}>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="px-8 sm:px-10 py-4 sm:py-6 text-base sm:text-lg rounded-2xl group bg-transparent"
-                >
-                  <PlayIcon className="mr-3 h-5 w-5 group-hover:scale-110 transition-transform" />
-                  Watch Demo
                 </Button>
               </Link>
             </motion.div>

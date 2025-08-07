@@ -2,7 +2,7 @@
 
 **Flowledge** is an AI-assisted ticketing platform where users can create support tickets and get help from domain experts. Each ticket is automatically processed by an AI agent that summarizes the issue, generates helpful notes, and intelligently assigns it to the most suitable expert based on their skills. After assignment, users and experts can collaborate through threaded responses until the issue is resolved.
 
-Built as a full-stack project to explore AI-driven workflows, role-based interaction, and real-time ticket resolution.
+Built to explore AI-driven workflows, role-based interaction, and real-time ticket resolution.
 
 ---
 
