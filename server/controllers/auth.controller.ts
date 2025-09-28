@@ -78,12 +78,16 @@ export const signup: Controller = async (req, res) => {
     }
 
     // Fire Inngest Event
-    await inngest.send({
-      name: "user/signup",
-      data: {
-        email,
-      },
-    });
+    try {
+      await inngest.send({
+        name: "user/signup",
+        data: {
+          email,
+        },
+      });
+    } catch (inngestError) {
+      console.warn("Inngest event failed:", inngestError);
+    }
 
     // Final Response
     return res.status(HTTP_STATUS.CREATED).json(
@@ -165,12 +169,16 @@ export const expertSignup: Controller = async (req, res) => {
     }
 
     // Fire Inngest Event
-    await inngest.send({
-      name: "user/signup",
-      data: {
-        email,
-      },
-    });
+    try {
+      await inngest.send({
+        name: "user/signup",
+        data: {
+          email,
+        },
+      });
+    } catch (inngestError) {
+      console.warn("Inngest event failed:", inngestError);
+    }
 
     // Final Response
     return res.status(HTTP_STATUS.CREATED).json(
@@ -222,14 +230,6 @@ export const signin: Controller = async (req, res) => {
         message: "Incorrect Password",
       });
     }
-
-    // Fire Inngest Event
-    await inngest.send({
-      name: "user/signin",
-      data: {
-        email,
-      },
-    });
 
     // Generate Tokens
     const { accessToken, refreshToken } = await generateTokens({

@@ -38,12 +38,16 @@ export const createTicket: Controller = async (req, res) => {
       .returning();
 
     // Fire Inngest Event
-    await inngest.send({
-      name: "ticket/create",
-      data: {
-        ticketId: newTicket.id,
-      },
-    });
+    try {
+      await inngest.send({
+        name: "ticket/create",
+        data: {
+          ticketId: newTicket.id,
+        },
+      });
+    } catch (inngestError) {
+      console.warn("Inngest event failed:", inngestError);
+    }
 
     // Final Response
     return res.status(HTTP_STATUS.CREATED).json(
@@ -195,7 +199,11 @@ export const updateTicketStatus: Controller = async (req, res) => {
     }
 
     // Fire Inngest Event
-    await inngest.send({ name: "ticket/resolve", data: { ticketId } });
+    try {
+      await inngest.send({ name: "ticket/resolve", data: { ticketId } });
+    } catch (inngestError) {
+      console.warn("Inngest event failed:", inngestError);
+    }
 
     // Final Response
     return res.status(HTTP_STATUS.OK).json(
