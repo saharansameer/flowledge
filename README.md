@@ -1,24 +1,22 @@
 # Flowledge
 
-**Flowledge** is an AI-assisted ticketing platform where users can create support tickets and get help from domain experts. Each ticket is automatically processed by an AI agent that summarizes the issue, generates helpful notes, and intelligently assigns it to the most suitable expert based on their skills. After assignment, users and experts can collaborate through threaded responses until the issue is resolved.
-
-Built to explore AI-driven workflows, role-based interaction, and real-time ticket resolution.
+**Flowledge** is an AI-assisted ticketing platform where users can create support tickets and get help from domain experts. Each ticket is processed by the AI Agent that summarizes the issue, generates helpful notes, and assigns it to the most suitable expert based on their skills. After assignment, users and experts can collaborate through threaded responses until the issue is resolved.
 
 ---
 
 ## Tech Stack
 
-- **React** – Frontend framework for building the UI
-- **Tailwind CSS** – Utility-first CSS framework for styling
-- **shadcn/ui** – Accessible, styled component library
-- **TanStack Router & Query** – Type-safe routing and server-state management
-- **Node.js + Express** – Backend server handling APIs and business logic
-- **PostgreSQL** – Relational database for storing users, tickets, and messages
-- **Drizzle ORM** – Type-safe SQL ORM for PostgreSQL
-- **JWT (Auth)** – Used for secure session management
-- **AgentKit (by Inngest)** – AI agent & event-driven workflow engine for background processing
-- **Google Gemini API** – Used as the language model for the custom AI agent
-- **Resend** – Email service for sending notifications on key events
+- **React**
+- **Tailwind CSS**
+- **shadcn/ui** 
+- **TanStack Router & Query**
+- **Node.js + Express**
+- **PostgreSQL**
+- **Drizzle ORM** –
+- **JWT (Auth)**
+- **AgentKit (by Inngest)**
+- **Google Gemini API** 
+- **Resend**
 
 ---
 
@@ -60,4 +58,4 @@ Built to explore AI-driven workflows, role-based interaction, and real-time tick
 ## Deployment
 
 Fully deployed and live at [`flowledge.sameersaharan.com`](https://flowledge.sameersaharan.com)  
-Built by [Sameer Saharan](https://sameersaharan.com)
+built by [Sameer Saharan](https://sameersaharan.com)
