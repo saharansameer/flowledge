@@ -1,5 +1,5 @@
-import { createAgent, gemini } from "@inngest/agent-kit";
-import { GEMINI_API_KEY } from "@/env";
+import { createAgent, openai } from "@inngest/agent-kit";
+import { OPENAI_API_KEY } from "@/env";
 
 export async function analyzeTicket({
   title,
@@ -25,9 +25,9 @@ export async function analyzeTicket({
     - The format must be a raw JSON object.
 
     Repeat: Do not wrap your output in markdown or code fences.`,
-    model: gemini({
-      model: "gemini-2.0-flash-lite",
-      apiKey: GEMINI_API_KEY,
+    model: openai({
+      model: "gpt-4o-mini",
+      apiKey: OPENAI_API_KEY,
     }),
   });
 
