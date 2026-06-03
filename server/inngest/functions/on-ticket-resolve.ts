@@ -15,8 +15,9 @@ export const onTicketResolve = inngest.createFunction(
   {
     id: "on-ticket-resolve",
     retries: 1,
+    triggers: { event: "ticket/resolve" },
   },
-  { event: "ticket/resolve" },
+
   async ({ event, step }) => {
     try {
       const { ticketId } = event.data;
@@ -36,7 +37,8 @@ export const onTicketResolve = inngest.createFunction(
 
       // Step Two - Find email recipient
       const recipient = await step.run("find-email-recipient", async () => {
-        const id = ticket.status === "RESOLVED" ? ticket.creator : ticket.assignee;
+        const id =
+          ticket.status === "RESOLVED" ? ticket.creator : ticket.assignee;
 
         const recipientDetails = await db.query.users.findFirst({
           where: eq(users.id, id!),
@@ -48,8 +50,12 @@ export const onTicketResolve = inngest.createFunction(
 
       // Step Three - Send Email
       await step.run("send-ticket-status-email", async () => {
-        const subject = recipient.role === "USER" ? "Ticket Resolved" : "Ticket Closed";
-        const { html, text } = recipient.role === "USER" ? ticketResolvedStatusTemplate(ticket.id) : ticketClosedStatusTemplate(ticket.id);
+        const subject =
+          recipient.role === "USER" ? "Ticket Resolved" : "Ticket Closed";
+        const { html, text } =
+          recipient.role === "USER"
+            ? ticketResolvedStatusTemplate(ticket.id)
+            : ticketClosedStatusTemplate(ticket.id);
 
         await sendEmail({ to: recipient.email, subject, html, text });
       });
