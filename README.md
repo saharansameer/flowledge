@@ -10,12 +10,12 @@ Flowledge is an Agentic AI ticketing platform that enables users to create suppo
 - **Tailwind CSS**
 - **shadcn/ui** 
 - **TanStack Router & Query**
-- **Node.js + Express**
+- **Node.js**
+- **Express**
 - **PostgreSQL**
-- **Drizzle ORM** –
+- **Drizzle ORM**
 - **JWT (Auth)**
-- **AgentKit (by Inngest)**
-- **Google Gemini API** 
+- **Inngest**
 - **Resend**
 
 ---
@@ -46,12 +46,17 @@ Flowledge is an Agentic AI ticketing platform that enables users to create suppo
 
 ## Architecture Notes
 
-- **Frontend**: Built with React and TanStack Router/Query for type-safe navigation and server state.
-- **Backend**: Express-based API server built in Node.js, handling routing, auth, and core business logic.
-- **Database**: PostgreSQL stores all persistent entities — tickets, users, conversations — via Drizzle ORM.
-- **AI Workflows**: Built in-house using the **Gemini API** as the language model. Runs via **AgentKit** for async processing and expert assignment.
-- **Email Notifications**: **Resend** is used to send transactional emails on signup and when a ticket is closed or resolved.
-- **Roles & Auth**: Signup and session flows are tailored for users and experts, with proper role-checking on all operations.
+- **Frontend**: Built with React. TanStack Router handles navigation and TanStack Query manages server state and data fetching.
+
+- **Backend**: Node.js with Express powers the API layer. It handles routing, authentication, authorization, and core business logic.
+
+- **Database**: PostgreSQL stores application data including users, tickets, and conversations. Drizzle ORM is used for schema definition and type-safe queries.
+
+- **AI Processing**: *GPT-4o-mini* is used to analyze tickets and assist with expert assignment. Background tasks are handled asynchronously using AgentKit.
+
+- **Email Notifications**: Resend is used to send transactional emails such as account creation confirmations and ticket status updates.
+
+- **Authentication and Roles**: Separate flows exist for users and experts. Role-based access checks are enforced at the API level for all protected operations.
 
 ---
 

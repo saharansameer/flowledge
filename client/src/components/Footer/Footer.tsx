@@ -1,11 +1,12 @@
 import { Link } from "@tanstack/react-router";
+import { getCurrentFullYear } from "@/lib/utils";
 
 export function Footer() {
   return (
     <div className="mx-auto md:px-1 py-4 border-t border-t-[#d5d5d5] dark:border-border">
       <div className="flex flex-col md:flex-row justify-between items-center">
         <p className="text-xs text-muted-foreground">
-          &copy; 2025 Flowledge. All Rights Reserved.
+          &copy; 2025-{getCurrentFullYear()} Flowledge. All rights reserved.
         </p>
         <p className="text-xs text-muted-foreground">
           built by{" "}
