@@ -6,11 +6,13 @@ import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 import { sendEmail } from "@/utils/email/resend";
-import { userWelcomeEmailTemplate, expertWelcomeEmailTemplate } from "@/utils/email/templates";
+import {
+  userWelcomeEmailTemplate,
+  expertWelcomeEmailTemplate,
+} from "@/utils/email/templates";
 
 export const onSignup = inngest.createFunction(
-  { id: "on-signup", retries: 1 },
-  { event: "user/signup" },
+  { id: "on-signup", retries: 1, triggers: { event: "user/signup" } },
   async ({ event, step }) => {
     try {
       const { email } = event.data;
@@ -32,7 +34,10 @@ export const onSignup = inngest.createFunction(
       // Step Two - send a welcome email to user
       await step.run("send-welcome-email", async () => {
         const subject = "Welcome to Flowledge";
-        const { html, text } = user.role === "USER" ? userWelcomeEmailTemplate : expertWelcomeEmailTemplate;
+        const { html, text } =
+          user.role === "USER"
+            ? userWelcomeEmailTemplate
+            : expertWelcomeEmailTemplate;
 
         await sendEmail({ to: user.email, subject, html, text });
       });
